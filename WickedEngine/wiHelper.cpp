@@ -2371,6 +2371,11 @@ namespace wi::helper
 		{
 			GlobalFree(hClipboardData);
 		}
+#elif defined(__APPLE__)
+		wi::vector<uint8_t> png;
+		if (!saveTextureToMemoryFile(texture, "PNG", png))
+			return;
+		wi::apple::SetClipboardImagePNG(png.data(), png.size());
 #endif // PLATFORM_WINDOWS_DESKTOP
 	}
 }

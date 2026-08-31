@@ -341,6 +341,31 @@ void SetClipboardText(const char* str)
 	[pasteboard setString:[NSString stringWithUTF8String:str] forType:NSPasteboardTypeString];
 }
 
+void SetClipboardImagePNG(const void* data, size_t size)
+{
+	if (data == nullptr || size == 0)
+		return;
+
+	auto apply = ^{
+		@autoreleasepool
+		{
+			NSData* png = [NSData dataWithBytes:data length:size];
+			if (png == nil)
+				return;
+
+			NSPasteboard* pasteboard = [NSPasteboard generalPasteboard];
+			[pasteboard clearContents];
+			[pasteboard declareTypes:@[NSPasteboardTypePNG] owner:nil];
+			[pasteboard setData:png forType:NSPasteboardTypePNG];
+		}
+	};
+
+	if ([NSThread isMainThread])
+		apply();
+	else
+		dispatch_sync(dispatch_get_main_queue(), apply);
+}
+
 void* CreateCursorFromARGB8ImageData(const void* data, uint32_t width, uint32_t height, int hotspotX, int hotspotY)
 {
 	const size_t bytesPerRow = width * sizeof(uint32_t);
@@ -546,6 +571,29 @@ void SetClipboardText(const char* str)
 {
 	UIPasteboard* pasteboard = [UIPasteboard generalPasteboard];
 	pasteboard.string = [NSString stringWithUTF8String:str];
+}
+
+void SetClipboardImagePNG(const void* data, size_t size)
+{
+	if (data == nullptr || size == 0)
+		return;
+
+	auto apply = ^{
+		@autoreleasepool
+		{
+			NSData* png = [NSData dataWithBytes:data length:size];
+			UIImage* image = [UIImage imageWithData:png];
+			if (image == nil)
+				return;
+
+			[UIPasteboard generalPasteboard].image = image;
+		}
+	};
+
+	if ([NSThread isMainThread])
+		apply();
+	else
+		dispatch_sync(dispatch_get_main_queue(), apply);
 }
 
 void* CreateCursorFromARGB8ImageData(const void* data, uint32_t width, uint32_t height, int hotspotX, int hotspotY)

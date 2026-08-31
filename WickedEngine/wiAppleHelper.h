@@ -26,6 +26,7 @@ bool IsWindowFullScreen(void* handle);
 void OpenUrl(const char* url);
 std::string GetClipboardText();
 void SetClipboardText(const char* str);
+void SetClipboardImagePNG(const void* data, size_t size);
 void* CreateCursorFromARGB8ImageData(const void* data, uint32_t width, uint32_t height, int hotspotX, int hotspotY);
 void GetSafeArea(void* window, float& left, float& right, float& top, float& bottom);
 }
